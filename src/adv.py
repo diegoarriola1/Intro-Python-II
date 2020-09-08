@@ -55,16 +55,48 @@ player1 = Player(room["outside"])
 
 # TODO Input parser REPL
 while True:
+    playerInv = [x.name for x in player1.inv] if len(player1.inv) else "Empty"
     # print current location and room description
     print()
     print(f"Current Location: {player1.room.name}")
     print(f"Hint: {player1.room.description}")
+    print(f"Inventory: {playerInv}")
+    print(f"Surroundings: {player1.room.items}")
+    print()
+    print("""
+    Controls
+        take <item name>
+        drop <item name>
+        n: go north
+        s: go south
+        e: go east
+        w: go west
+    """)
     print()
     # take in user input
     move = str(input("Which direction would you like to go?: ")).lower()
     moves = ["n", "s", "e", "w", "q"]
+    items = move.split()[1:]
     # parse through input and evaluate
-    if move in moves:
+    if move.startswith("take "):
+        if len(items) > 1:
+            error = "Only one item at a time"
+        else:
+            item_names = [x.name for x in player1.room.inv]
+            item_index = item_names.index(items[0])
+            player1.get(player1.room.inv[item_index])
+            player1.room.drop(item_index)
+
+    elif move.startswith("drop "):
+        if len(items) > 1:
+            error = "Only one item at a time"
+        else:
+            item_names = [x.name for x in player1.inv]
+            item_index = item_names.index(items[0])
+            player1.room.get(player1.inv[item_index])
+            player1.drop(item_index)
+
+    elif move in moves:
         if move == 'n':
             if hasattr(player1.room, 'n_to'):
                 player1.room = player1.room.n_to
